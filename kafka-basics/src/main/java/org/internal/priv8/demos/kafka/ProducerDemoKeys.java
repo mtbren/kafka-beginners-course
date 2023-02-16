@@ -7,32 +7,37 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-public class ProducerDemoWithCallbacks {
-    private static final Logger log = LoggerFactory.getLogger(ProducerDemoWithCallbacks.class.getSimpleName());
+public class ProducerDemoKeys {
+    private static final Logger log = LoggerFactory.getLogger(ProducerDemoKeys.class.getSimpleName());
+
     public static void main(String[] args) {
         log.info("Kafka Producer!!!");
 
+        String topic = "demo_java";
+
         // Set Server properties
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers","localhost:9092");
+        properties.setProperty("bootstrap.servers", "localhost:9092");
 
         // Set Producer properties
         properties.setProperty("key.serializer", StringSerializer.class.getName());
         properties.setProperty("value.serializer", StringSerializer.class.getName());
 
-        properties.setProperty("batch.size","400");
-
-        // Dont do this for production since this is not very efficient
-        //properties.setProperty("partitioner.class", RoundRobinPartitioner.class.getName());
 
         // Create the Producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-        for(int j=1;j<=30;j++) {
+        for (int j = 0; j < 2; j++) {
             for (int i = 1; i <= 10; i++) {
+
+
+                String key = "id_" + i;
+                String value = "hello world not again " + i;
+
+
                 // Create a Producer Record
                 ProducerRecord<String, String> producerRecord =
-                        new ProducerRecord<>("demo_java", "Msg " + i);
+                        new ProducerRecord<>(topic, key, value);
 
                 // Send the message/data to the Producer
                 producer.send(producerRecord, new Callback() {
@@ -41,12 +46,7 @@ public class ProducerDemoWithCallbacks {
                         // Will be executed everytime a record is sent successfully or if there is an exception in the send process
                         if (e == null) {
                             // Record was successfully sent
-                            log.info("Received new metadata \n" +
-                                    "Topic: " + metadata.topic() + "\n" +
-                                    "Partition: " + metadata.partition() + "\n" +
-                                    "Offset: " + metadata.offset() + "\n" +
-                                    "TimeStamp: " + metadata.timestamp()
-                            );
+                            log.info("Key: " + key + " | Partition: " + metadata.partition());
                         } else {
                             log.error("Error while producing ", e);
                         }
@@ -55,7 +55,7 @@ public class ProducerDemoWithCallbacks {
                 });
             }
             try {
-                Thread.sleep(400);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

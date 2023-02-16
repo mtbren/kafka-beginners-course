@@ -11,21 +11,21 @@ import java.util.Properties;
 public class ProducerDemo {
     private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class.getSimpleName());
     public static void main(String[] args) {
-        log.info("This works!!!");
+        log.info("Kafka Producer!!!");
 
-        // Create Producer properties
+        // Set Server properties
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers","localhost:9092");
+
+        // Set Producer properties
         properties.setProperty("key.serializer", StringSerializer.class.getName());
         properties.setProperty("value.serializer", StringSerializer.class.getName());
-
-
 
         // Create the Producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
         // Create a Producer Record
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("demo_java","Day 2 with Kafka producer");
+        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("demo_java","Day 3 with Kafka producer");
 
         // Send the message/data to the Producer
         producer.send(producerRecord);
